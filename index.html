@@ -1711,7 +1711,8 @@
             </div>
             
             <div class="contact-form scroll-reveal">
-                <form id="contactForm" action="https://formspree.io/f/mkogdyjp" method="POST">
+<form id="contactForm" action="https://formspree.io/f/mkogdyjp" method="POST">
+    <input type="hidden" name="_subject" value="New Portfolio Contact Form Submission">
                     <div class="form-group">
                         <label for="name">Full Name *</label>
                         <input type="text" id="name" name="name" required>
@@ -1852,67 +1853,31 @@
         const successMessage = document.getElementById('successMessage');
         
         contactForm.addEventListener('submit', function(e) {
-    // Form will submit to Formspree
-    setTimeout(() => {
-        successMessage.classList.add('show');
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-        }, 4000);
-    }, 500);
-});
-        
-        // Animated counters
-        const animateValue = (element, start, end, duration, suffix = '') => {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
-                element.textContent = value + suffix;
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        };
-        
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumbers = entry.target.querySelectorAll('.stat-number');
-                    statNumbers.forEach(number => {
-                        const text = number.textContent;
-                        const value = parseInt(text.replace(/[^0-9]/g, ''));
-                        const suffix = text.replace(/[0-9]/g, '');
-                        animateValue(number, 0, value, 2000, suffix);
-                    });
-                    statsObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.5 });
-        
-        const statsSection = document.querySelector('.hero-stats');
-        if (statsSection) {
-            statsObserver.observe(statsSection);
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Send to Formspree
+    fetch('https://formspree.io/f/mkogdyjp', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
         }
-        
-        // Interactive neon graphic mouse follow
-        document.addEventListener('mousemove', (e) => {
-            const neonFrame = document.querySelector('.neon-frame');
-            if (!neonFrame) return;
-            
-            const rect = neonFrame.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            
-            const dots = document.querySelectorAll('.dot');
-            dots.forEach((dot, index) => {
-                const speed = (index + 1) * 0.02;
-                const moveX = x * speed;
-                const moveY = y * speed;
-                dot.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            });
-        });
+    }).then(response => {
+        if (response.ok) {
+            successMessage.classList.add('show');
+            contactForm.reset();
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 4000);
+        } else {
+            alert('Oops! There was a problem submitting your form');
+        }
+    }).catch(error => {
+        alert('Oops! There was a problem submitting your form');
+    });
+});
     </script>
 </body>
 </html>
